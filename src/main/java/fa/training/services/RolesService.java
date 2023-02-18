@@ -1,7 +1,7 @@
-package fa.training.service;
+package fa.training.services;
 
-import fa.training.entity.RoleName;
-import fa.training.entity.Roles;
+import fa.training.entites.RoleName;
+import fa.training.entites.Roles;
 
 import java.util.Optional;
 

@@ -1,15 +1,15 @@
-package fa.training.service;
+package fa.training.services.impl;
 
-import fa.training.entity.Users;
-import fa.training.repository.UserRepository;
+import fa.training.entites.Users;
+import fa.training.repositories.UserRepository;
+import fa.training.services.UserServics;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Optional;
 
 @Service
-public class UserServicsImpl implements UserServics{
+public class UserServicsImpl implements UserServics {
 
     @Autowired
     private UserRepository userRepository;

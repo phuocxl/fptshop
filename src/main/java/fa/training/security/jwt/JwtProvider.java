@@ -14,7 +14,7 @@ import java.util.Date;
 public class JwtProvider {
     private static final Logger logger = LoggerFactory.getLogger(JwtProvider.class);
     private String jwtSecret = "phuocxl@gmail.com";
-    private int jwtExpiration = 86400;
+    private int jwtExpiration = 5000;
 
 
 

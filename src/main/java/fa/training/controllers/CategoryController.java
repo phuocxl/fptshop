@@ -1,7 +1,7 @@
-package fa.training.controller;
+package fa.training.controllers;
 
-import fa.training.entity.Category;
-import fa.training.service.CategoryServices;
+import fa.training.entites.Category;
+import fa.training.services.CategoryServices;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,6 +14,7 @@ public class CategoryController {
     private CategoryServices categoryServices;
 
     @GetMapping("/")
+
     public List<Category> getAllCategory() {
         return categoryServices.getAllCategory();
     }

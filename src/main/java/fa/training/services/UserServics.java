@@ -1,7 +1,6 @@
-package fa.training.service;
+package fa.training.services;
 
-import fa.training.entity.Users;
-import org.springframework.stereotype.Repository;
+import fa.training.entites.Users;
 
 import java.util.Optional;
 

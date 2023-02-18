@@ -1,9 +1,9 @@
-package fa.training.service;
+package fa.training.services.impl;
 
 import fa.training.dto.ProductDTO;
-import fa.training.entity.Category;
-import fa.training.entity.Product;
-import fa.training.repository.ProductRepository;
+import fa.training.entites.Product;
+import fa.training.repositories.ProductRepository;
+import fa.training.services.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -12,10 +12,9 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
-public class ProductServiceImpl implements ProductService{
+public class ProductServiceImpl implements ProductService {
     @Autowired
     private ProductRepository productRepository;
 
@@ -50,7 +49,7 @@ public class ProductServiceImpl implements ProductService{
         if(id >= 1) {
             Product product = productRepository.getReferenceById(id);
             if(product != null) {
-                productRepository.delete(product);
+                productRepository.deleteById(id);
                 return true;
             }
         }
@@ -112,6 +111,11 @@ public class ProductServiceImpl implements ProductService{
             productDTOList.add(productDTO);
         }
         return productDTOList;
+    }
+
+    @Override
+    public List<Product> findProductApple() {
+        return productRepository.findProductApple();
     }
 
 

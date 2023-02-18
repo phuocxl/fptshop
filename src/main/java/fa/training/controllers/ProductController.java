@@ -1,18 +1,16 @@
-package fa.training.controller;
+package fa.training.controllers;
 
 import fa.training.dto.ProductDTO;
-import fa.training.entity.Product;
+import fa.training.entites.Product;
 import fa.training.model.DataRespose;
-import fa.training.repository.ProductRepository;
-import fa.training.service.ProductService;
+import fa.training.services.CategoryServices;
+import fa.training.services.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
+import org.springframework.http.*;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
@@ -28,10 +26,11 @@ import java.util.stream.IntStream;
 @RestController
 @RequestMapping("/product")
 public class ProductController {
-
     @Autowired
     private ProductService productService;
 
+    @Autowired
+    private CategoryServices categoryServices;
 
     // RestAPI
 
@@ -40,11 +39,26 @@ public class ProductController {
     public ResponseEntity<DataRespose> getAllProduct() {
         List<Product> product = productService.getProduct();
         if (product.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+            return ResponseEntity.status(HttpStatus.OK).body(
                     new DataRespose("error", "cannot find product")
             );
         } else {
 
+            return ResponseEntity.status(HttpStatus.OK).body(
+                    new DataRespose(product)
+            );
+        }
+
+    }
+
+    @GetMapping("/apple")
+    public ResponseEntity<DataRespose> getAllProductApple() {
+        List<Product> product = productService.findProductApple();
+        if (product.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.OK).body(
+                    new DataRespose("error", "cannot find product")
+            );
+        } else {
             return ResponseEntity.status(HttpStatus.OK).body(
                     new DataRespose(product)
             );
@@ -64,7 +78,6 @@ public class ProductController {
         if(product.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         } else {
-            HttpHeaders header = new HttpHeaders();
             return ResponseEntity.status(HttpStatus.OK).body(product);
         }
     }
@@ -85,12 +98,6 @@ public class ProductController {
 
     }
 
-    @GetMapping("/name-color")
-    public List<Product> getNameColor(@RequestParam("name") String name,
-                                      @RequestParam("color") String color) {
-        return productService.findByProductNameAndColor(name, color);
-    }
-
 
     @GetMapping("/pageable/{offset}/{limit}")
     public ResponseEntity<DataRespose> getPageable(@PathVariable("limit") int limit,
@@ -99,7 +106,7 @@ public class ProductController {
         Page<Product> productPage = productService.getPageProduct(pageable);
         if (productPage != null) {
             int totalPages = productPage.getTotalPages();
-            return (offset + 1 > totalPages) ? ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+            return (offset + 1 > totalPages) ? ResponseEntity.status(HttpStatus.OK).body(
                     new DataRespose("error", "cannot page =" + offset)
             ) : ResponseEntity.status(HttpStatus.OK).body(
                     new DataRespose(productPage)
@@ -114,19 +121,23 @@ public class ProductController {
 
     //Add product
     @PostMapping("/add")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<DataRespose> addProduct2(@RequestBody Product product) {
 
         List<Product> productName = productService.findByProductName(product.getProductName().trim());
 
         if (productName.size() > 0) {
-            return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).body(
+            return ResponseEntity.status(HttpStatus.OK).body(
                     new DataRespose("", "product name already taken")
+            );
+        } else {
+            product = new Product(product.getProductName(), product.getDesc(), product.getColor(),
+                    product.getPrice(),product.getPricesSale(),product.getImage(), product.getCategory());
+            return ResponseEntity.status(HttpStatus.OK).body(
+                    new DataRespose("", "add success", productService.addProduct(product))
             );
         }
 
-        return ResponseEntity.status(HttpStatus.OK).body(
-                new DataRespose("", "add success", productService.addProduct(product))
-        );
     }
 
     //Update Product

@@ -1,7 +1,4 @@
-package fa.training.entity;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+package fa.training.entites;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;

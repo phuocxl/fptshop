@@ -1,7 +1,8 @@
-package fa.training.service;
+package fa.training.services.impl;
 
-import fa.training.entity.Category;
-import fa.training.repository.CategoryRepository;
+import fa.training.entites.Category;
+import fa.training.repositories.CategoryRepository;
+import fa.training.services.CategoryServices;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

@@ -1,16 +1,16 @@
-package fa.training.controller;
+package fa.training.controllers;
 
 import fa.training.dto.SignIn;
 import fa.training.dto.UserDTO;
 import fa.training.dto.response.JwtResponse;
-import fa.training.entity.RoleName;
-import fa.training.entity.Roles;
-import fa.training.entity.Users;
+import fa.training.entites.RoleName;
+import fa.training.entites.Roles;
+import fa.training.entites.Users;
 import fa.training.model.DataRespose;
 import fa.training.security.jwt.JwtProvider;
 import fa.training.security.userprincal.UserPrinciple;
-import fa.training.service.RolesService;
-import fa.training.service.UserServics;
+import fa.training.services.RolesService;
+import fa.training.services.UserServics;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,7 +27,9 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.validation.Valid;
 import java.time.LocalDate;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -64,12 +66,12 @@ public class UserController {
         strRole.forEach(role -> {
             switch (role) {
                 case "admin":
-                    Roles adminRole = rolesService.findByRoleName(RoleName.ADMIN).orElseThrow(()->
+                    Roles adminRole = rolesService.findByRoleName(RoleName.ROLE_ADMIN).orElseThrow(()->
                             new RuntimeException("Role not found"));
                     roles.add(adminRole);
                     break;
                 default:
-                    Roles userRole = rolesService.findByRoleName(RoleName.USER).orElseThrow(()->
+                    Roles userRole = rolesService.findByRoleName(RoleName.ROLE_USER).orElseThrow(()->
                             new RuntimeException("Role not found"));
                     roles.add(userRole);
             }
@@ -88,8 +90,11 @@ public class UserController {
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String token = jwtProvider.createToken(authentication);
         UserPrinciple userPrinciple = (UserPrinciple) authentication.getPrincipal();
-        return ResponseEntity.ok(new JwtResponse(token, userPrinciple.getFuillName(),
-                userPrinciple.getAuthorities()));
+        List<String> roles = userPrinciple.getAuthorities().stream()
+                .map(item -> item.getAuthority())
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(new JwtResponse(token, userPrinciple.getIdUser(), userPrinciple.getFuillName(),
+                roles));
     }
 
 }

@@ -1,7 +1,7 @@
-package fa.training.repository;
+package fa.training.repositories;
 
-import fa.training.entity.RoleName;
-import fa.training.entity.Roles;
+import fa.training.entites.RoleName;
+import fa.training.entites.Roles;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

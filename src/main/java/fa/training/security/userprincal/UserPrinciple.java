@@ -1,7 +1,7 @@
 package fa.training.security.userprincal;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import fa.training.entity.Users;
+import fa.training.entites.Users;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -63,6 +63,14 @@ public class UserPrinciple implements UserDetails {
 
     public void setFuillName(String fuillName) {
         this.fuillName = fuillName;
+    }
+
+    public Long getIdUser() {
+        return idUser;
+    }
+
+    public void setIdUser(Long idUser) {
+        this.idUser = idUser;
     }
 
     public static UserPrinciple build(Users user) {

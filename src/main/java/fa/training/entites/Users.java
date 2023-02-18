@@ -1,11 +1,10 @@
-package fa.training.entity;
+package fa.training.entites;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
 import java.time.LocalDate;
 import java.util.HashSet;
@@ -51,6 +50,9 @@ public class Users {
     @JoinTable(name = "user_role",
     joinColumns = @JoinColumn(name = "id_user"),inverseJoinColumns = @JoinColumn(name = "id_role"))
     Set<Roles> roles = new HashSet<>();
+
+    @OneToMany(mappedBy = "orderId", cascade = CascadeType.ALL)
+    private Set<Order> orders;
 
     public Users() {
     }

@@ -1,7 +1,7 @@
-package fa.training.service;
+package fa.training.services;
 
 import fa.training.dto.ProductDTO;
-import fa.training.entity.Product;
+import fa.training.entites.Product;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -24,4 +24,6 @@ public interface ProductService {
     List<Product> findByProductNameAndColor(String name, String color);
 
     public List<ProductDTO> getAllProductDTO();
+
+    public List<Product> findProductApple();
 }

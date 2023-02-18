@@ -1,9 +1,6 @@
-package fa.training.entity;
+package fa.training.entites;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotEmpty;
-import java.util.Set;
 
 @Entity
 @Table(name = "roles")

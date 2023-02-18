@@ -3,6 +3,7 @@ package fa.training.config;
 import fa.training.security.jwt.JwtEntryPoint;
 import fa.training.security.jwt.JwtTokenFilter;
 import fa.training.security.userprincal.UserDetailService;
+import fa.training.security.userprincal.UserPrinciple;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -51,7 +52,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http.cors().and().csrf().disable()
                 .authorizeRequests()
-                .antMatchers("/api/auth/**").permitAll()
+                .antMatchers("/api/auth/**","/category/**","/product/**")
+                .permitAll()
                 .anyRequest().authenticated()
                 .and().exceptionHandling()
                 .authenticationEntryPoint(jwtEntryPoint)

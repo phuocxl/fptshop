@@ -1,6 +1,6 @@
-package fa.training.repository;
+package fa.training.repositories;
 
-import fa.training.entity.Category;
+import fa.training.entites.Category;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

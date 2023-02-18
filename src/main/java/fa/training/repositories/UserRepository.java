@@ -1,6 +1,6 @@
-package fa.training.repository;
+package fa.training.repositories;
 
-import fa.training.entity.Users;
+import fa.training.entites.Users;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

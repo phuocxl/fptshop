@@ -1,8 +1,9 @@
-package fa.training.service;
+package fa.training.services.impl;
 
-import fa.training.entity.RoleName;
-import fa.training.entity.Roles;
-import fa.training.repository.RolesRepository;
+import fa.training.entites.RoleName;
+import fa.training.entites.Roles;
+import fa.training.repositories.RolesRepository;
+import fa.training.services.RolesService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
