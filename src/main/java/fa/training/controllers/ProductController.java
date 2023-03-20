@@ -9,32 +9,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.*;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.ui.Model;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.ModelAndView;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
+import java.util.*;
 
-
-//@Controller
 @RestController
 @RequestMapping("/product")
 public class ProductController {
     @Autowired
     private ProductService productService;
-
     @Autowired
     private CategoryServices categoryServices;
-
-    // RestAPI
-
-    //get All
     @GetMapping("/")
     public ResponseEntity<DataRespose> getAllProduct() {
         List<Product> product = productService.getProduct();
@@ -48,12 +36,10 @@ public class ProductController {
                     new DataRespose(product)
             );
         }
-
     }
-
-    @GetMapping("/apple")
-    public ResponseEntity<DataRespose> getAllProductApple() {
-        List<Product> product = productService.findProductApple();
+    @GetMapping("/category")
+    public ResponseEntity<DataRespose> getAllProductApple(@RequestParam(name = "id") long id) {
+        List<Product> product = productService.findProductCategory(id);
         if (product.isEmpty()) {
             return ResponseEntity.status(HttpStatus.OK).body(
                     new DataRespose("error", "cannot find product")
@@ -65,13 +51,19 @@ public class ProductController {
         }
 
     }
-
-    //getProductDTO
-//    @GetMapping("/productDTO")
-    public List<ProductDTO> getAll() {
-        return productService.getAllProductDTO();
+    @GetMapping("/name")
+    public ResponseEntity<DataRespose> getProductName(@RequestParam(name = "name") String name) {
+        List<Product> productListName = productService.findByProductName(name);
+        if (productListName.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.OK).body(
+                    new DataRespose("error","cannot find product")
+            );
+        } else {
+            return ResponseEntity.status(HttpStatus.OK).body(
+                    new DataRespose(productListName)
+            );
+        }
     }
-
     @GetMapping("/productDTO")
     public ResponseEntity<List<ProductDTO>> getAllProductDTO() {
         List<ProductDTO> product = productService.getAllProductDTO();
@@ -81,8 +73,6 @@ public class ProductController {
             return ResponseEntity.status(HttpStatus.OK).body(product);
         }
     }
-
-
     @GetMapping("/{id}")
     public ResponseEntity<DataRespose> getOneProduct(@PathVariable("id") Long id) {
         Optional<Product> product = productService.getOneProduct(id);
@@ -95,33 +85,41 @@ public class ProductController {
                     new DataRespose("error", "cannot find product id=" + id)
             );
         }
-
     }
 
+    @GetMapping("/page")
+    public ResponseEntity<Map<String, Object>> getProductPage(@RequestParam("offset") int offset,
+                                                              @RequestParam("limit") int limit,
+                                                              @RequestParam( required = false)
+                                                                  String productName) {
+        try {
+            List<Product> products = new ArrayList<>();
+            Pageable pageable = PageRequest.of(offset,limit, Sort.by("pricesSale").descending());
+            Page<Product> productPage ;
+            if(productName == null) {
+                productPage = productService.getPageProduct(pageable);
 
-    @GetMapping("/pageable/{offset}/{limit}")
-    public ResponseEntity<DataRespose> getPageable(@PathVariable("limit") int limit,
-                                                   @PathVariable("offset") int offset) {
-        Pageable pageable = PageRequest.of(offset, limit);
-        Page<Product> productPage = productService.getPageProduct(pageable);
-        if (productPage != null) {
-            int totalPages = productPage.getTotalPages();
-            return (offset + 1 > totalPages) ? ResponseEntity.status(HttpStatus.OK).body(
-                    new DataRespose("error", "cannot page =" + offset)
-            ) : ResponseEntity.status(HttpStatus.OK).body(
-                    new DataRespose(productPage)
-            );
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
-                    new DataRespose("error", "cannot find product")
-            );
+            } else {
+                productPage = productService.findByProductNameContaining(productName,pageable);
+
+            }
+            products = productPage.getContent();
+            if(products.isEmpty()) {
+                return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+            } else {
+                Map<String, Object> response = new HashMap<>();
+                response.put("product", products);
+                response.put("currentPage",productPage.getNumber());
+                response.put("totalItem",productPage.getTotalElements());
+                response.put("totalPage",productPage.getTotalPages());
+                return new ResponseEntity<>(response, HttpStatus.OK);
+            }
+        } catch (Exception e) {
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-
-
-    //Add product
     @PostMapping("/add")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<DataRespose> addProduct2(@RequestBody Product product) {
 
         List<Product> productName = productService.findByProductName(product.getProductName().trim());
@@ -161,105 +159,10 @@ public class ProductController {
 
         }
     }
-
-    //Delete Product
     @DeleteMapping("/{id}")
-    public boolean deleteProduct1(@PathVariable("id") Long id) {
-        return productService.deleteProduct(id);
+    public ResponseEntity<DataRespose> delete(@PathVariable("id") long id) {
+            return ResponseEntity.status(HttpStatus.OK).body(
+                    new DataRespose("","delete success",productService.delete(id))
+            );
     }
-
-
-    //Thymeleaf
-
-    @GetMapping("/list")
-    public String getAllProduct(Model model, @RequestParam(name = "name", required = false) String name) {
-
-        List<Product> listSearch = null;
-
-        if (StringUtils.hasText(name)) {
-            listSearch = productService.findByProductNameContaining(name);
-        } else {
-            listSearch = productService.getProduct();
-        }
-        model.addAttribute("product", listSearch);
-        return "index--";
-    }
-
-    @GetMapping("/paginated")
-    //paginated
-    public String getAllProduct(Model model, @RequestParam(name = "name", required = false) String name,
-                                @RequestParam("page") Optional<Integer> page,
-                                @RequestParam("size") Optional<Integer> size) {
-
-        int currentPage = page.orElse(0);
-        int pageSize = size.orElse(5);
-
-        Pageable pageable = PageRequest.of(currentPage, pageSize);
-        //Sort.by("fullName")
-        Page<Product> resultPage = null;
-
-
-        if (StringUtils.hasText(name)) {
-            resultPage = productService.findByProductNameContaining(name, pageable);
-            model.addAttribute("name", name);
-        } else {
-            resultPage = productService.getPageProduct(pageable);
-        }
-
-        int totalPages = resultPage.getTotalPages();
-        if (totalPages > 0) {
-            int start = Math.max(1, currentPage - 2);
-            int end = Math.min(currentPage + 2, totalPages);
-
-            if (totalPages > 5) {
-                if (end == totalPages) {
-                    start = end - 5;
-                } else if (start == 1) {
-                    end = start + 5;
-                }
-            }
-
-            List<Integer> pageNumber = IntStream.rangeClosed(start, end)
-                    .boxed()
-                    .collect(Collectors.toList());
-            model.addAttribute("pageNumber", pageNumber);
-
-        }
-
-        model.addAttribute("product", resultPage);
-        return "index";
-    }
-
-
-    @GetMapping("/list/add")
-    public ModelAndView viewAddProduct(Product product) {
-        return new ModelAndView("addproduct");
-    }
-
-    @PostMapping("/list")
-    public String saveProduct(@ModelAttribute("save") Product product) {
-        productService.addProduct(product);
-        return "redirect:/paginated";
-    }
-
-    @GetMapping("/list/update/{id}")
-    public String viewUpdateProduct(@PathVariable("id") Long id, Model model) {
-        Optional<Product> product = productService.getOneProduct(id);
-        Product product1 = product.get();
-        model.addAttribute("product", product1);
-        return "update";
-    }
-
-    @PostMapping("/update/{id}")
-    public String updateProduct(@PathVariable("id") Long id, @ModelAttribute("product") Product product) {
-        productService.updateProduct(id, product);
-        return "redirect:/paginated";
-    }
-
-    @GetMapping("/delete/{id}")
-    public String deleteProduct(@PathVariable("id") Long id) {
-        productService.deleteProduct(id);
-        return "redirect:/paginated";
-    }
-
 }

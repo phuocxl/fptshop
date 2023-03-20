@@ -98,29 +98,14 @@ public class ProductServiceImplTest {
     }
 
     @Test
-    void deleteProductFalse() {
-        long id = 0;
-//        assertFalse();
-        assertEquals(false, productService.deleteProduct(id));
-    }
-
-    @Test
-    void deleteProductSuccess() {
-        long id = 1;
-        Product productFromDB = new Product();
-
-        when(productRepository.getReferenceById(id)).thenReturn(productFromDB);
-
-        assertEquals(true, productService.deleteProduct(id));
-    }
-
-    @Test
     void getAllProductSuccess() {
         List<Product> productListFromDB = new ArrayList<>();
 
         when(productRepository.findAll()).thenReturn(productListFromDB);
 
-        assertEquals(productListFromDB, productService.getProduct());
+        List<Product> actual = productService.getProduct();
+
+        assertEquals(productListFromDB, actual);
 
     }
 
@@ -172,15 +157,7 @@ public class ProductServiceImplTest {
 
     }
 
-    @Test
-    void getAllProductNameColorSuccess() {
-        String name = "ip";
-        String color = "Tim";
 
-        List<Product> productListFromDB = productRepository.findByProductNameAndColor(name,color);
-
-        assertEquals(productListFromDB, productService.findByProductNameAndColor(name, color));
-    }
 
 //    @Test
     void getAllProductDTO() {
@@ -196,15 +173,5 @@ public class ProductServiceImplTest {
         List<ProductDTO> actual = productService.getAllProductDTO();
         assertEquals(expected, actual);
     }
-
-    @Test
-    void getProductAppleSuccess() {
-        List<Product> productListFromDB = productRepository.findProductApple();
-
-        assertEquals(productListFromDB, productService.findProductApple());
-    }
-
-
-
 
 }

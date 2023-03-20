@@ -51,11 +51,11 @@ public class UserController {
     @PostMapping("/signup")
     public ResponseEntity<?> register(@Valid @RequestBody UserDTO userDTO) {
         if (userServics.existsByUserName(userDTO.getUserName())) {
-            return new ResponseEntity<>(new DataRespose("erro", "the username existed! please try again!"),
+            return new ResponseEntity<>(new DataRespose("error", "the username existed! please try again!"),
                     HttpStatus.OK);
         }
         if (userServics.existsByEmail(userDTO.getEmail())) {
-            return new ResponseEntity<>(new DataRespose("erro", "the email existed! please try again!"),
+            return new ResponseEntity<>(new DataRespose("error", "the email existed! please try again!"),
                     HttpStatus.OK);
         }
         Users user = new Users(userDTO.getUserName(), passwordEncoder.encode(userDTO.getPassword()), userDTO.getEmail(),
@@ -96,5 +96,4 @@ public class UserController {
         return ResponseEntity.ok(new JwtResponse(token, userPrinciple.getIdUser(), userPrinciple.getFuillName(),
                 roles));
     }
-
 }

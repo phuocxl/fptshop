@@ -1,12 +1,9 @@
 package fa.training.model;
 
 public class DataRespose {
-
     private String error;
     private String message;
     private Object data;
-
-
     public String getError() {
         return error;
     }

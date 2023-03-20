@@ -26,7 +26,7 @@ public class CategoryServicesImpl implements CategoryServices {
     @Override
     public Category updateCategory(long id, Category category) {
         if(category != null) {
-            Category category1 = categoryRepository.getReferenceById(id);
+            Category category1 = categoryRepository.getById(id);
             if(category1 != null) {
                 category1.setCategoryName(category.getCategoryName());
                 return categoryRepository.saveAndFlush(category1);

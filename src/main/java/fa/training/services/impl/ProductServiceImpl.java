@@ -1,6 +1,7 @@
 package fa.training.services.impl;
 
 import fa.training.dto.ProductDTO;
+import fa.training.entites.Category;
 import fa.training.entites.Product;
 import fa.training.repositories.ProductRepository;
 import fa.training.services.ProductService;
@@ -17,7 +18,6 @@ import java.util.Optional;
 public class ProductServiceImpl implements ProductService {
     @Autowired
     private ProductRepository productRepository;
-
     @Override
     public Product addProduct(Product product) {
         if(product != null) {
@@ -29,7 +29,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public Product updateProduct(Long id, Product product) {
         if(product != null) {
-            Product product1 = productRepository.getReferenceById(id);
+            Product product1 = productRepository.getById(id);
             if(product1 != null) {
                 product1.setProductName(product.getProductName());
                 product1.setCategory(product.getCategory());
@@ -42,20 +42,6 @@ public class ProductServiceImpl implements ProductService {
         return null;
     }
 
-
-
-    @Override
-    public boolean deleteProduct(Long id) {
-        if(id >= 1) {
-            Product product = productRepository.getReferenceById(id);
-            if(product != null) {
-                productRepository.deleteById(id);
-                return true;
-            }
-        }
-        return false;
-    }
-
     @Override
     public List<Product> getProduct() {
         return productRepository.findAll();
@@ -65,8 +51,6 @@ public class ProductServiceImpl implements ProductService {
     public Optional<Product> getOneProduct(Long id) {
         return productRepository.findById(id);
     }
-
-
 
     @Override
     public List<Product> findByProductNameContaining(String name) {
@@ -79,22 +63,26 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    public boolean delete(long id) {
+        if(id > 0) {
+            Product product = productRepository.getReferenceById(id);
+            if(product != null) {
+                productRepository.delete(product);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
     public Page<Product> findByProductNameContaining(String name, Pageable pageable) {
         return productRepository.findByProductNameContaining(name,pageable);
     }
-
 
     @Override
     public List<Product> findByProductName(String name) {
         return productRepository.findByProductName(name);
     }
-
-
-    @Override
-    public List<Product> findByProductNameAndColor(String name, String color) {
-        return productRepository.findByProductNameAndColor(name, color);
-    }
-
     @Override
     public List<ProductDTO> getAllProductDTO() {
 
@@ -114,9 +102,8 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public List<Product> findProductApple() {
-        return productRepository.findProductApple();
+    public List<Product> findProductCategory(long id) {
+        return productRepository.findProductCategory( id);
     }
-
 
 }
